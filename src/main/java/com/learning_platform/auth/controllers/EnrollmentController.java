@@ -14,13 +14,20 @@ import java.util.List;
 public class EnrollmentController {
     private final EnrollmentService enrollmentService;
 
-    @PostMapping("/{studentEmail}/{courseId}")
-    public Enrollment enrollStudent(@PathVariable String studentEmail, @PathVariable Long courseId) {
-        return enrollmentService.enrollStudent(studentEmail, courseId);
+    // ✅ Enroll using token
+    @PostMapping("/{courseId}")
+    public ResponseEntity<Enrollment> enrollStudent(
+            @PathVariable Long courseId,
+            @RequestHeader("Authorization") String token) {
+        Enrollment enrollment = enrollmentService.enrollStudent(token, courseId);
+        return ResponseEntity.ok(enrollment);
     }
 
-    @GetMapping("/{studentEmail}")
-    public List<Enrollment> getEnrollmentsByStudent(@PathVariable String studentEmail) {
-        return enrollmentService.getEnrollmentsByStudent(studentEmail);
+    // ✅ Get enrollments for current user using token
+    @GetMapping
+    public ResponseEntity<List<Enrollment>> getEnrollmentsByStudent(
+            @RequestHeader("Authorization") String token) {
+        List<Enrollment> enrollments = enrollmentService.getEnrollmentsByToken(token);
+        return ResponseEntity.ok(enrollments);
     }
 }
