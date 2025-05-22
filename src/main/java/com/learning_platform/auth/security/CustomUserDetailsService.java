@@ -3,6 +3,8 @@ package com.learning_platform.auth.security;
 import com.learning_platform.auth.models.User;
 import com.learning_platform.auth.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +25,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+
+       if (!user.isActive()) {
+            throw new DisabledException("Account is deactivated");
+        }
         // ✅ Ensure ROLE_ prefix exists when creating authorities
         String roleName = user.getRole().name(); // Keep it as stored in DB (e.g., "ROLE_STUDENT")
 
